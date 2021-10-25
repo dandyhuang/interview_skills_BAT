@@ -22,3 +22,15 @@ key经过hash后共64位，根据hmap中B的值，计算它到底要落在哪个
 
 ### map无序
 Go设计者为了让大家不依赖遍历的顺序，故意在实现map遍历时加入了随机数。因为map中如果扩容，key的迁移就会导致无序了。
+
+### sync.Map
+
+### 总结
+
+解决并发读写 map 的思路是加一把大锁，或者把一个 map 分成若干个小 map，对 key 进行哈希，只操作相应的小 map。前者锁的粒度比较大，影响效率；后者实现起来比较复杂，容易出错。
+
+
+
+### reference
+
+[Concurrent_map多个map](https://github.com/orcaman/concurrent-map)
