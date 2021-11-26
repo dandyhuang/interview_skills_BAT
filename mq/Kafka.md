@@ -325,3 +325,6 @@ MySQL 的主从模式比起来，并没有这种问题，即 MySQL 不需要进�
 [Kafka高性能原理](https://zhuanlan.zhihu.com/p/105509080)
 
 [Why Kafka is fast](https://preparingforcodinginterview.wordpress.com/2019/10/04/kafka-3-why-is-kafka-so-fast/)
+
+[Golang中如何正确的使用sarama包操作Kafka？](https://juejin.cn/post/6999263126713696293)
+
