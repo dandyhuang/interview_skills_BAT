@@ -53,3 +53,10 @@ select * from xxx lock in share mode;
 select * from xxx for update;
 ```
 
+### 两阶段锁和事务的两阶段提交
+
+没有关系，两阶段锁指，在一个事务中锁的操作分为两个阶段**加锁和解锁阶段**
+
+![image-20211220172530800](/Users/11126518/knowledge/interview_skills_BAT/img/image-sql-lock.png)
+
+![image-20211220172609099](/Users/11126518/knowledge/interview_skills_BAT/img/image-sql-lock2.png)
