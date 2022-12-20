@@ -1,6 +1,11 @@
 # goroutine认识
 
+### 为什么golang不适合做cpu密集型程序
+
+CPU 密集型就意味着每个执行体都是急需 CPU 的，G1 吃 CPU 都不够，还切到 G2 去干嘛？所以 CPU 密集型的程序**最好的情况就是不调度！** 绑核都来不及呢。想要提高这种程序的性能，就是加钱，买核，买 CPU，买 GPU，把 CPU 核并行起来。 更准确的是 Go 适合的是网络 IO 密集型的场景，而非磁盘 IO 密集型。甚至可以说，**Go 对于磁盘 IO 密集型并不友好**
+
 ### 介绍一下`goroutine`
+
 ​	现代操作系统中，线程是处理器调度和分配的基本单位，进程作为资源拥有的基本单位，如虚拟空间、代码、数据和系统资源等。操作系统为了系统安全，将体系架构分为了用户空间和内核空间；内核空间包括，cpu资源，io资源和内存等硬件资源，用户空间必须通过系统调用，库函数等来调用内核空间。
 
 ​	线程的
@@ -138,4 +143,6 @@ sysmon 也叫监控线程，变动的周期性检查，好处
 
 [单核CPU下Go语言调度及抢占式调度的实现](https://www.jianshu.com/p/9238bf572b56)
 
-[1](https://juejin.cn/post/6886321367604527112)
+[Golang并发调度的GMP模型](https://juejin.cn/post/6886321367604527112)
+
+[浅析 Go IO 的知识框架](https://blog.csdn.net/EDDYCJY/article/details/119090963?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0-119090963-blog-125075811.pc_relevant_3mothn_strategy_recovery&spm=1001.2101.3001.4242.1&utm_relevant_index=3)

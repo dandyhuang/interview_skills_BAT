@@ -18,7 +18,15 @@
 - POW 算法
 - ZAB 协议
 
+### raft算法
 
+标准的强一致只读操作是完全是在Leader端进行的。类似redis重定向到leader端来获取数据。
+
+ raft 的 etcd 实现了 Linearizable Read 来解决智能化在Leader端进行的问题
+
+```
+读请求到了 follower 后,follower会去向 leader 请求 readindex(也就是当时 leader 的 commitindex), leader 在确认自己还是 leader 之后,就会吧 readindex 发给 follower,follower 会对比自己的 commitindex 和 readindex,只有commitindex 大于等于 readindex 之后,才能读取数据返回.
+```
 
 ### zookeeper有哪些特点
 
