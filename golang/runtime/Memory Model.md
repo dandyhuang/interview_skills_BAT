@@ -51,7 +51,7 @@ func main() {
 
 为什么在一个线程修改了共享变量，另外一个线程感知不到呢？这里我们需要了解下CPU的Cache结构。
 
-![image-20221212151950249](/Users/11126518/knowledge/interview_skills_BAT/golang/img/cpu-cache.png)
+![image-20221212151950249](/Users/dandyhuang/knowledge/interview_skills_BAT/golang/img/cpu-cache.png)
 
 现代多核`CPU`的`Cache `模型基本都跟上图所示一样，`L1 L2 cache`是每个核独占的，只有`L3`是共享的，当多个`CPU`读、写同一个变量时，就需要在多个`CPU`的`Cache`之间同步数据，跟分布式系统一样，必然涉及到一致性的问题。
 
@@ -66,15 +66,15 @@ func main() {
 
 只有`Core 0`访问变量x，它的`Cache line`状态为`E(Exclusive)`:
 
-![image-20221212152637631](/Users/11126518/knowledge/interview_skills_BAT/golang/img/cache-line-exclusive.png)
+![image-20221212152637631](/Users/dandyhuang/knowledge/interview_skills_BAT/golang/img/cache-line-exclusive.png)
 
 `3`个`Core`都访问变量`x`，它们对应的`Cache line`为`S(Shared)`状态:
 
-![image-20221212152718299](/Users/11126518/knowledge/interview_skills_BAT/golang/img/cache-line-shared.png)
+![image-20221212152718299](/Users/dandyhuang/knowledge/interview_skills_BAT/golang/img/cache-line-shared.png)
 
 `Core 0`修改了`x`的值之后，这个`Cache line`变成了`M(Modified)`状态，其他`Core`对应的`Cache line`变成了`I(Invalid)`状态 :
 
-![image-20221212152745865](/Users/11126518/knowledge/interview_skills_BAT/golang/img/cache-line-invalid.png)
+![image-20221212152745865](/Users/dandyhuang/knowledge/interview_skills_BAT/golang/img/cache-line-invalid.png)
 
 在`MESI`协议中，每个`Cache`的`Cache`控制器不仅知道自己的读写操作，而且也监听(`snoop`)其它`Cache`的读写操作。每个`Cache line`所处的状态根据本核和其它核的读写操作在`4`个状态间进行迁移。
 
@@ -152,7 +152,7 @@ thread1 done  11061
 
 > 流水线在处理器的内部被组织成层级，各个层级的流水线能半独立地单独运作。每一个层级都被管理并且链接到一条“链”，因而每个层级的输出被送到其它层级直至任务完成。 处理器的这种组织方式能使总体的处理时间显著缩短。
 
-![image-20221212155002658](/Users/11126518/knowledge/interview_skills_BAT/golang/img/Instruction pipeline.png)
+![image-20221212155002658](/Users/dandyhuang/knowledge/interview_skills_BAT/golang/img/Instruction pipeline.png)
 
 流水线化则是实现各个工位不间断执行各自的任务，例如同样的四工位设计，指令拾取无需等待下一工位完成就进行下一条指令的拾取，其余工位亦然。
 
@@ -354,7 +354,7 @@ func atomicLoad() uint32 {
 
 我们`go build -gcflags "-N -l" atomic.go` 编译以后再`objdump -d atomic`导出对应的汇编代码。我们看到`normalLoad()`和`atomicLoad()` 对应的汇编代码是一样的，也印证了，我们上面说的atomic.Load方法在[IA64](https://github.com/golang/go/blob/master/src/runtime/internal/atomic/atomic_amd64.go#L17) 就是简单的MOV指令。
 
-![image-20221212191609466](/Users/11126518/knowledge/interview_skills_BAT/golang/img/mov.png)
+![image-20221212191609466](/Users/dandyhuang/knowledge/interview_skills_BAT/golang/img/mov.png)
 
 再回来看，我们知道Golang的Atomic方法保证了三件事，原子性、可见性、有序性。
 
@@ -515,7 +515,7 @@ func getInstance() (*UserInfo, error) {
 
 ### 4.4 Flase Sharing 问题
 
-![image-20221212193338921](/Users/11126518/knowledge/interview_skills_BAT/golang/img/flase sharing.png)
+![image-20221212193338921](/Users/dandyhuang/knowledge/interview_skills_BAT/golang/img/flase sharing.png)
 
 上图中 `thread1` 位于 `core1` ，而 `thread2` 位于 `core2` ，二者均想更新彼此独立的两个变量，但是由于两个变量位于不同核心中的同一个 `L1` 缓存行中，此时可知的是两个缓存行的状态应该都是 `Shared` ，而对于同一个缓存行的操作，不同的 `core` 间必须通过发送 `RFO` 消息来争夺所有权 (`ownership`) ，如果 `core1` 抢到了， `thread1` 因此去更新该缓存行，把状态变成 `Modified` ，那就会导致 `core2` 中对应的缓存行失效变成 `Invalid` ，当 `thread2` 取得所有权之后再去更新该缓存行时必须先让 `core1` 把对应的缓存行刷回 `L3` 缓存/主存，然后它再从 `L3` 缓存/主存中加载该缓存行进 `L1` 之后才能进行修改。然而，这个过程又会导致 `core1` 对应的缓存行失效变成 `Invalid` ，这个过程将会一直循环发生，从而导致 `L1` 高速缓存并未起到应有的作用，反而会降低性能；轮番夺取所有权不但带来大量的 `RFO` 消息，而且如果某个线程需要读此行数据时，`L1` 和 `L2` 缓存上都是失效数据，只有 `L3` 缓存上是同步好的数据，而从前面的内容可以知道，`L3` 的读取速度相比 `L1/L2` 要慢了数十倍，性能下降很大；更坏的情况是跨槽读取，`L3` 都不能命中，只能从主存上加载，那就更慢了。
 
@@ -523,7 +523,7 @@ func getInstance() (*UserInfo, error) {
 
 `Cache Line`缓存测试
 
-```
+```go
 func main() {
 
     arr := make([][]int, 64*1024)
@@ -582,7 +582,7 @@ type CacheLinePad struct{ _ [CacheLinePadSize]byte }
 
 ### 4.6 CPU Cache 是如何存放数据的
 
-![image-20221212202653856](/Users/11126518/knowledge/interview_skills_BAT/golang/img/cpu-cache-save.png)
+![image-20221212202653856](/Users/dandyhuang/knowledge/interview_skills_BAT/golang/img/cpu-cache-save.png)
 
 由上图可以知`Cache`是由`Set`组成，`Set`由`Cache Line`组成，`Cache Line`由`Valid Bit`（MESI协议中这个是2个字节），`Tag`和`Data`组成。其中`Data`是真正要缓存的内存地址中的数据，而`Tag`是用来搜索`Cache Line`的标签。
 
@@ -600,7 +600,7 @@ Cache Line Count = 32*1024 / 64 = 512个
 
 先看下内存地址表示的含义
 
-![image-20221212204629304](/Users/11126518/knowledge/interview_skills_BAT/golang/img/cpu cache 寻址.png)
+![image-20221212204629304](/Users/dandyhuang/knowledge/interview_skills_BAT/golang/img/cpu cache 寻址.png)
 
 内存被分成了`TAG`、Set Index、`Block Offset` 三部分。
 
@@ -611,11 +611,11 @@ Cache Line Count = 32*1024 / 64 = 512个
 
 
 
-![image-20221212205004163](/Users/11126518/knowledge/interview_skills_BAT/golang/img/cache read1.png)
+![image-20221212205004163](/Users/dandyhuang/knowledge/interview_skills_BAT/golang/img/cache read1.png)
 
-![image-20221212205026607](/Users/11126518/knowledge/interview_skills_BAT/golang/img/cache read2.png)
+![image-20221212205026607](/Users/dandyhuang/knowledge/interview_skills_BAT/golang/img/cache read2.png)
 
-![image-20221212205054876](/Users/11126518/knowledge/interview_skills_BAT/golang/img/cache read3.png)
+![image-20221212205054876](/Users/dandyhuang/knowledge/interview_skills_BAT/golang/img/cache read3.png)
 
 ### 4.8 CPU Cache 三种寻址方式
 
