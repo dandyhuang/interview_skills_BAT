@@ -1,3 +1,23 @@
+### mysql的日志有哪些
+
+MySQL的日志主要包括以下几种：
+
+二进制日志（binary log）：记录基于语句或行级别的所有数据更改，可用于主从复制和可恢复性的场景。
+
+事务日志/重做日志（transaction log/redo log）：记录事务在数据库中所做的修改，如插入、更新和删除操作，用于保证数据库的ACID特性和恢复性。
+
+慢查询日志（slow query log）：记录执行时间超过阈值的SQL语句，通常用于优化查询性能。
+
+错误日志（error log）：记录MySQL服务器的错误、警告和通知信息。
+
+查询日志（general query log）：记录所有经过服务器的SQL查询。
+
+撤销日志/回滚日志（undo log）：记录数据更新前的值，用于回滚操作。
+
+中继日志（relay log）：用于主从复制中，记录主库的二进制日志内容，以及从库在主库上已经执行过的操作。
+
+GTID日志（global transaction identifier log）：MySQL5.6版本后引入，用于提供全局唯一的事务标识符，并跟踪主从同步的位置。
+
 ### 1 redolog、 undolog、binlog区别
 
 首先我们先理解WAL技术，即先写日志，在写磁盘。这里的写日志原因就是这三大日志都是顺序写。我们可以打开datadir中，ib_logfile0、ib_logfile1写redolog， mysql-bin.000001写binlog，ibdata1写undolog使用。而磁盘数据对应每个库里头，如test库里头，db.opt  test.frm  test.ibd三个部分组成存储。其中*.frm文件存储的是表空间结构数据，*.idb存储的是索引及用户数据(每张表内的数据)。这里就会涉及到数据随机存储的问题。详细可以[查看](https://blog.csdn.net/mashaokang1314/article/details/109716569)，一定要看收获会很大
@@ -105,6 +125,8 @@ binlog实现归档的功能，主从复制和数据恢复。binlog没有crash-sa
 通过两段式提交我们知道redo log和binlog在各个阶段会被打上prepare或者commit的标识，同时还会记录事务的XID，有了这些数据，在数据库重启的时候，会先去redo log里检查所有的事务，如果redo log的事务处于commit状态，那么说明在commit后发生了crash，此时直接把redo log的数据恢复就行了，如果redo log是prepare状态，那么说明commit之前发生了crash，此时binlog的状态决定了当前事务的状态，如果binlog中有对应的XID，说明binlog已经写入成功，只是没来的及提交，此时再次执行commit就行了，如果binlog中找不到对应的XID，说明binlog没写入成功就crash了，那么此时应该执行回滚。
 
 ### 2 
+
+
 
 
 ### reference

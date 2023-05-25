@@ -24,4 +24,4 @@
 
 [epoll早期使用了mmap， 后面没有用了?](https://segmentfault.com/q/1010000022582226)
 
-[[字节序问题之大小端模式讲解](https://www.cnblogs.com/renhui/p/13600572.html)](https://www.cnblogs.com/renhui/p/13600572.html)
+[字节序问题之大小端模式讲解](https://www.cnblogs.com/renhui/p/13600572.html)
