@@ -258,6 +258,10 @@ Redis 提供了槽迁移的命令，主要步骤就是让目标节点准备好�
 
 ![image-20220926203156261](./img/ASK.png)
 
+1 Ask会返回具体转向的server端的ip和端口
+
+2  发送Asking命令后，就不会在做key的slot计算，不会返回Moved错误。所以就是为什么需要asking的原因。
+
 - Redis Cluster 是如何分片的？
 
 ### smart client 是什么？
