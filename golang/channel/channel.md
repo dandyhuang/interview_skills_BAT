@@ -13,7 +13,7 @@ go语言中，不要通过共享内存来通信，而要通过通信来实现内
 **比较深入的 发送g调度的时机(对goroutine调度不是很清楚，建议不要提，因为后面肯定还会问gmp)**
 
 1. 发送数据时发现 Channel 上存在等待接收数据的 Goroutine，立刻设置处理器的 runnext 属性，但是并不会立刻触发调度；
-2. 发送数据时并没有找到接收方并且缓冲区已经满了，这时会将自己加入 Channel 的 sendq 队列并调用 runtime.goparkunlock 触发 Goroutine 的调度让出处理器的使用权；
+2. 发送数据时并没有找到接收方并且缓冲区已经满了，这时会将自己加入 Channel 的 sendq 队列并调用 runtime.gopark unlock 触发 Goroutine 的调度让出处理器的使用权；
 
 ### 关于关闭 channel 有几点需要注意的是：
 

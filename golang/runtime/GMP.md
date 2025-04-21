@@ -23,7 +23,7 @@ CPU 密集型就意味着每个执行体都是急需 CPU 的，G1 吃 CPU 都不
 
 - M(Thread)：操作系统上的线程，G运行与M上，一个G可能由多个不同的M运行，一个M可以运行多个G。M最多可以创建 10000 个线程
 
-- P(Processor)：处理器，他包含了运行G的资源，如果线程M想运行G，必须先获取P，P还包含了可运行的G`队列`。一个M一个时刻只拥有一个P，M和P的数量是1：1的。最多有GOMAXPROCS个，可通过runtime.GOMAXPROCS(N)修改，N表示设置的个数。P可以被看做运行在线程上的本地调度器；
+- P(Processor)：处理器，他包含了运行G的资源，x。一个M一个时刻只拥有一个P，M和P的数量是1：1的。最多有GOMAXPROCS个，可通过runtime.GOMAXPROCS(N)修改，N表示设置的个数。P可以被看做运行在线程上的本地调度器；
 
   ![GMP模型](../img/GMP.webp)
 
